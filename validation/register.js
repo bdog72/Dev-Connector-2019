@@ -1,6 +1,5 @@
 const Validator = require('validator');
 const isEmpty = require('./is-empty');
-// import isEmpty from './is-empty';
 
 module.exports = function validateRegisterInput(data) {
   let errors = {};
@@ -34,7 +33,7 @@ module.exports = function validateRegisterInput(data) {
     errors.password = 'Password must be at least 6 characters';
   }
 
-  if (Validator.isLength(data.password2)) {
+  if (Validator.isEmpty(data.password2)) {
     errors.password2 = 'Confirm Password field is required';
   }
 

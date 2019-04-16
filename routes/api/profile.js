@@ -3,12 +3,12 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 
-// Load validation
+// Load Validation
 const validateProfileInput = require('../../validation/profile');
 const validateExperienceInput = require('../../validation/experience');
 const validateEducationInput = require('../../validation/education');
-// Load Profile Model
 
+// Load Profile Model
 const Profile = require('../../models/Profile');
 // Load User Model
 const User = require('../../models/User');
@@ -45,13 +45,15 @@ router.get(
 // @access  Public
 router.get('/all', (req, res) => {
   const errors = {};
+
   Profile.find()
     .populate('user', ['name', 'avatar'])
     .then(profiles => {
       if (!profiles) {
         errors.noprofile = 'There are no profiles';
-        return res.status(404).json();
+        return res.status(404).json(errors);
       }
+
       res.json(profiles);
     })
     .catch(err => res.status(404).json({ profile: 'There are no profiles' }));
@@ -60,6 +62,7 @@ router.get('/all', (req, res) => {
 // @route   GET api/profile/handle/:handle
 // @desc    Get profile by handle
 // @access  Public
+
 router.get('/handle/:handle', (req, res) => {
   const errors = {};
 
@@ -70,6 +73,7 @@ router.get('/handle/:handle', (req, res) => {
         errors.noprofile = 'There is no profile for this user';
         res.status(404).json(errors);
       }
+
       res.json(profile);
     })
     .catch(err => res.status(404).json(err));
@@ -78,6 +82,7 @@ router.get('/handle/:handle', (req, res) => {
 // @route   GET api/profile/user/:user_id
 // @desc    Get profile by user ID
 // @access  Public
+
 router.get('/user/:user_id', (req, res) => {
   const errors = {};
 
@@ -88,6 +93,7 @@ router.get('/user/:user_id', (req, res) => {
         errors.noprofile = 'There is no profile for this user';
         res.status(404).json(errors);
       }
+
       res.json(profile);
     })
     .catch(err =>
@@ -121,10 +127,11 @@ router.post(
     if (req.body.status) profileFields.status = req.body.status;
     if (req.body.githubusername)
       profileFields.githubusername = req.body.githubusername;
-    // Skills --- Split into a array
+    // Skills - Spilt into array
     if (typeof req.body.skills !== 'undefined') {
       profileFields.skills = req.body.skills.split(',');
     }
+
     // Social
     profileFields.social = {};
     if (req.body.youtube) profileFields.social.youtube = req.body.youtube;
@@ -150,6 +157,7 @@ router.post(
             errors.handle = 'That handle already exists';
             res.status(400).json(errors);
           }
+
           // Save Profile
           new Profile(profileFields).save().then(profile => res.json(profile));
         });
@@ -172,6 +180,7 @@ router.post(
       // Return any errors with 400 status
       return res.status(400).json(errors);
     }
+
     Profile.findOne({ user: req.user.id }).then(profile => {
       const newExp = {
         title: req.body.title,
@@ -182,8 +191,10 @@ router.post(
         current: req.body.current,
         description: req.body.description
       };
+
       // Add to exp array
       profile.experience.unshift(newExp);
+
       profile.save().then(profile => res.json(profile));
     });
   }
@@ -203,6 +214,7 @@ router.post(
       // Return any errors with 400 status
       return res.status(400).json(errors);
     }
+
     Profile.findOne({ user: req.user.id }).then(profile => {
       const newEdu = {
         school: req.body.school,
@@ -213,8 +225,10 @@ router.post(
         current: req.body.current,
         description: req.body.description
       };
+
       // Add to exp array
       profile.education.unshift(newEdu);
+
       profile.save().then(profile => res.json(profile));
     });
   }
@@ -234,7 +248,10 @@ router.delete(
           .map(item => item.id)
           .indexOf(req.params.exp_id);
 
+        // Splice out of array
         profile.experience.splice(removeIndex, 1);
+
+        // Save
         profile.save().then(profile => res.json(profile));
       })
       .catch(err => res.status(404).json(err));
@@ -255,7 +272,10 @@ router.delete(
           .map(item => item.id)
           .indexOf(req.params.edu_id);
 
+        // Splice out of array
         profile.education.splice(removeIndex, 1);
+
+        // Save
         profile.save().then(profile => res.json(profile));
       })
       .catch(err => res.status(404).json(err));

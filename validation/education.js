@@ -1,8 +1,7 @@
 const Validator = require('validator');
 const isEmpty = require('./is-empty');
-// import isEmpty from './is-empty';
 
-module.exports = function validateEducationInput(data) {
+module.exports = function validateExperienceInput(data) {
   let errors = {};
 
   data.school = !isEmpty(data.school) ? data.school : '';
@@ -23,7 +22,7 @@ module.exports = function validateEducationInput(data) {
   }
 
   if (Validator.isEmpty(data.from)) {
-    errors.from = 'FRom date field is required';
+    errors.from = 'From date field is required';
   }
 
   return {

@@ -32,7 +32,6 @@ router.post('/register', (req, res) => {
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
       errors.email = 'Email already exists';
-
       return res.status(400).json(errors);
     } else {
       const avatar = gravatar.url(req.body.email, {
@@ -84,12 +83,11 @@ router.post('/login', (req, res) => {
       return res.status(404).json(errors);
     }
 
-    // Check password
+    // Check Password
     bcrypt.compare(password, user.password).then(isMatch => {
       if (isMatch) {
         // User Matched
-
-        const payload = { id: user.id, name: user.name, avatar: user.avatar }; // Create JWT payload
+        const payload = { id: user.id, name: user.name, avatar: user.avatar }; // Create JWT Payload
 
         // Sign Token
         jwt.sign(
@@ -104,7 +102,7 @@ router.post('/login', (req, res) => {
           }
         );
       } else {
-        errors.password = 'Password Incorrect';
+        errors.password = 'Password incorrect';
         return res.status(400).json(errors);
       }
     });
